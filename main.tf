@@ -4,7 +4,7 @@ provider "aws" {
 
 data "aws_availability_zones" "available" {}
 
-module "aws_vpc" {
+module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.77.0"
 
@@ -18,7 +18,7 @@ module "aws_vpc" {
 
 resource "aws_db_subnet_group" "sng-labs" {
   name       = "sng-labs"
-  subnet_ids = module.aws_vpc.public_subnets
+  subnet_ids = module.vpc.public_subnets
 
   tags = {
     Name = "sng-labs"
@@ -27,7 +27,7 @@ resource "aws_db_subnet_group" "sng-labs" {
 
 resource "aws_security_group" "sg-labs" {
   name   = "sg-labs"
-  vpc_id = module.aws_vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     from_port   = 3306
@@ -52,11 +52,6 @@ resource "aws_db_parameter_group" "pg-labs" {
   name   = "pg-labs"
   family = "mysql8.0"
   description = "Parameter group for RDS labs instance"
-
-  parameter {
-    name  = "log_connections"
-    value = "1"
-  }
 }
 
 resource "aws_db_instance" "rds-mysql-labs" {
