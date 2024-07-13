@@ -1,13 +1,10 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
 provider "aws" {
   region = var.region
 }
 
 data "aws_availability_zones" "available" {}
 
-module "vpc" {
+module "aws_vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.77.0"
 
@@ -21,7 +18,7 @@ module "vpc" {
 
 resource "aws_db_subnet_group" "sng-labs" {
   name       = "sng-labs"
-  subnet_ids = module.vpc.public_subnets
+  subnet_ids = module.aws_vpc.public_subnets
 
   tags = {
     Name = "sng-labs"
@@ -30,7 +27,7 @@ resource "aws_db_subnet_group" "sng-labs" {
 
 resource "aws_security_group" "sg-labs" {
   name   = "sg-labs"
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.aws_vpc.vpc_id
 
   ingress {
     from_port   = 3306
