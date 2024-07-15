@@ -6,18 +6,17 @@ provider "aws" {
 # Create a VPC
 resource "aws_vpc" "vpc-labs" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
     Name = "vpc-labs"
   }
 }
 
-# Create IGW and attach to VPC
-resource "aws_internet_gateway" "igw" {}
-
-resource "aws_internet_gateway_attachment" "igw_attachment" {
-  internet_gateway_id = aws_internet_gateway.igw.id
-  vpc_id              = aws_vpc.vpc-labs.id
+# Create IGW
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.vpc-labs.id
 }
 
 # Create Subnets
