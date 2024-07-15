@@ -12,6 +12,10 @@ resource "aws_vpc" "vpc-labs" {
   }
 }
 
+resource "aws_internet_gateway" "igw" {
+    vpc_id = aws_vpc.vpc-labs.id
+}
+
 # Create Subnets
 resource "aws_subnet" "subnet-1" {
   vpc_id     = aws_vpc.vpc-labs.id
