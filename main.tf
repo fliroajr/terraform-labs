@@ -120,6 +120,7 @@ resource "aws_db_instance" "rds-mysql-labs" {
   vpc_security_group_ids = [aws_security_group.secg-labs.id]
   parameter_group_name   = aws_db_parameter_group.pg-mysql8-labs.name
   option_group_name      = aws_db_option_group.og-mysql-labs.name
+  performance_insights_enabled = true
   publicly_accessible    = true
   skip_final_snapshot    = true
 }
