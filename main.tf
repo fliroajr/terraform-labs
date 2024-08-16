@@ -19,34 +19,43 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc-labs.id
 }
 
+# # Create route table
+# resource "aws_route_table" "rtb-labs" {
+#   vpc_id = aws_vpc.vpc-labs.id
+
+#   tags = {
+#     name = "rtb-labs"
+#   }
+# }
+
 # Create Subnets
-resource "aws_subnet" "subnet-1" {
+resource "aws_subnet" "subnet-pub-1" {
   vpc_id     = aws_vpc.vpc-labs.id
   cidr_block = "10.0.1.0/24"
   availability_zone = "sa-east-1a"
 
   tags = {
-    Name = "pub-subnet-labs-1"
+    Name = "snet-pub-1"
   }
 }
 
-resource "aws_subnet" "subnet-2" {
+resource "aws_subnet" "subnet-pub-2" {
   vpc_id     = aws_vpc.vpc-labs.id
   cidr_block = "10.0.2.0/24"
   availability_zone = "sa-east-1b"
 
   tags = {
-    Name = "pub-subnet-labs-2"
+    Name = "snet-pub-2"
   }
 }
 
-resource "aws_subnet" "subnet-3" {
+resource "aws_subnet" "subnet-pub-3" {
   vpc_id     = aws_vpc.vpc-labs.id
   cidr_block = "10.0.3.0/24"
   availability_zone = "sa-east-1c"
 
   tags = {
-    Name = "pub-subnet-labs-3"
+    Name = "snet-pub-1"
   }
 }
 
@@ -76,7 +85,7 @@ resource "aws_security_group" "secg-labs" {
 # Create DB subnet group
 resource "aws_db_subnet_group" "sng-labs" {
   name       = "sng-labs"
-  subnet_ids = [aws_subnet.subnet-1.id, aws_subnet.subnet-2.id, aws_subnet.subnet-3.id]
+  subnet_ids = [aws_subnet.subnet-pub-1.id, aws_subnet.subnet-pub-2.id, aws_subnet.subnet-pub-3.id]
 
   tags = {
     Name = "sng-labs"
