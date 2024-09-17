@@ -5,7 +5,7 @@ provider "aws" {
 
 # Create a VPC
 resource "aws_vpc" "vpc-labs" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
   enable_dns_hostnames = true
 
@@ -30,8 +30,8 @@ resource "aws_internet_gateway" "igw" {
 
 # Create Subnets
 resource "aws_subnet" "subnet-pub-1" {
-  vpc_id     = aws_vpc.vpc-labs.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.vpc-labs.id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "sa-east-1a"
 
   tags = {
@@ -40,8 +40,8 @@ resource "aws_subnet" "subnet-pub-1" {
 }
 
 resource "aws_subnet" "subnet-pub-2" {
-  vpc_id     = aws_vpc.vpc-labs.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = aws_vpc.vpc-labs.id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "sa-east-1b"
 
   tags = {
@@ -50,8 +50,8 @@ resource "aws_subnet" "subnet-pub-2" {
 }
 
 resource "aws_subnet" "subnet-pub-3" {
-  vpc_id     = aws_vpc.vpc-labs.id
-  cidr_block = "10.0.3.0/24"
+  vpc_id            = aws_vpc.vpc-labs.id
+  cidr_block        = "10.0.3.0/24"
   availability_zone = "sa-east-1c"
 
   tags = {
@@ -94,7 +94,7 @@ resource "aws_db_subnet_group" "sng-labs" {
 
 # Create RDS option group
 resource "aws_db_option_group" "og-mysql-labs" {
-  name = "og-mysql-labs"
+  name                     = "og-mysql-labs"
   option_group_description = "Option Group"
   engine_name              = "mysql"
   major_engine_version     = "8.0"
@@ -109,18 +109,19 @@ resource "aws_db_parameter_group" "pg-mysql8-labs" {
 
 # Create RDS instance
 resource "aws_db_instance" "rds-mysql-labs" {
-  identifier             = "rds-mysql-labs"
-  instance_class         = "db.t3.micro"
-  allocated_storage      = 10
-  engine                 = "mysql"
-  engine_version         = "8.0"
-  username               = "admin"
-  password               = var.db_password
-  db_subnet_group_name   = aws_db_subnet_group.sng-labs.name
-  vpc_security_group_ids = [aws_security_group.secg-labs.id]
-  parameter_group_name   = aws_db_parameter_group.pg-mysql8-labs.name
-  option_group_name      = aws_db_option_group.og-mysql-labs.name
-  performance_insights_enabled = true
-  publicly_accessible    = true
-  skip_final_snapshot    = true
+  identifier                      = "rds-mysql-labs"
+  instance_class                  = "db.t3.micro"
+  allocated_storage               = 10
+  engine                          = "mysql"
+  engine_version                  = "8.0"
+  username                        = var.db_username
+  password                        = var.db_password
+  db_subnet_group_name            = aws_db_subnet_group.sng-labs.name
+  vpc_security_group_ids          = [aws_security_group.secg-labs.id]
+  parameter_group_name            = aws_db_parameter_group.pg-mysql8-labs.name
+  option_group_name               = aws_db_option_group.og-mysql-labs.name
+  # performance_insights_enabled    = true
+  # performance_insights_kms_key_id = "arn:aws:kms:sa-east-1:323005945174:key/7bc7927b-e6d7-4c8c-b50e-956575886093"
+  publicly_accessible             = true
+  skip_final_snapshot             = true
 }

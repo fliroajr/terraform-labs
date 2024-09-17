@@ -13,5 +13,5 @@ output "rds_port" {
 output "rds_username" {
   description = "RDS instance root username"
   value       = aws_db_instance.rds-mysql-labs.username
-  sensitive   = false
+  sensitive   = true
 }
