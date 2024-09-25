@@ -19,14 +19,34 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc-labs.id
 }
 
-# # Create route table
-# resource "aws_route_table" "rtb-labs" {
-#   vpc_id = aws_vpc.vpc-labs.id
+# Create route table
+resource "aws_route_table" "rtb-labs" {
+  vpc_id = aws_vpc.vpc-labs.id
 
-#   tags = {
-#     name = "rtb-labs"
-#   }
-# }
+  route {
+    cidr_block = aws_vpc.vpc-labs.cidr_block
+    gateway_id = "local"
+  }
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+
+  tags = {
+    Name = "rtb-labs"
+  }
+  depends_on = [ 
+    aws_vpc.vpc-labs,
+    aws_internet_gateway.igw
+  ]
+}
+
+resource "aws_main_route_table_association" "main-rtb" {
+  vpc_id         = aws_vpc.vpc-labs.id
+  route_table_id = aws_route_table.rtb-labs.id
+}
+
 
 # Create Subnets
 resource "aws_subnet" "subnet-pub-1" {
@@ -37,6 +57,9 @@ resource "aws_subnet" "subnet-pub-1" {
   tags = {
     Name = "snet-pub-1"
   }
+  depends_on = [ 
+    aws_vpc.vpc-labs
+   ]
 }
 
 resource "aws_subnet" "subnet-pub-2" {
@@ -47,6 +70,9 @@ resource "aws_subnet" "subnet-pub-2" {
   tags = {
     Name = "snet-pub-2"
   }
+  depends_on = [ 
+    aws_vpc.vpc-labs
+   ]
 }
 
 resource "aws_subnet" "subnet-pub-3" {
@@ -57,6 +83,9 @@ resource "aws_subnet" "subnet-pub-3" {
   tags = {
     Name = "snet-pub-1"
   }
+  depends_on = [ 
+    aws_vpc.vpc-labs
+   ]
 }
 
 resource "aws_security_group" "secg-labs" {
@@ -80,6 +109,9 @@ resource "aws_security_group" "secg-labs" {
   tags = {
     Name = "sg-labs"
   }
+  depends_on = [ 
+    aws_vpc.vpc-labs
+   ]
 }
 
 # Create DB subnet group
@@ -90,6 +122,9 @@ resource "aws_db_subnet_group" "sng-labs" {
   tags = {
     Name = "sng-labs"
   }
+  depends_on = [ 
+    aws_vpc.vpc-labs
+   ]
 }
 
 # Create RDS option group
@@ -124,4 +159,10 @@ resource "aws_db_instance" "rds-mysql-labs" {
   # performance_insights_kms_key_id = "arn:aws:kms:sa-east-1:323005945174:key/7bc7927b-e6d7-4c8c-b50e-956575886093"
   publicly_accessible             = true
   skip_final_snapshot             = true
+
+  depends_on = [ 
+    aws_db_subnet_group.sng-labs,
+    aws_db_option_group.og-mysql-labs,
+    aws_db_parameter_group.pg-mysql8-labs
+   ]
 }
