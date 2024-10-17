@@ -36,7 +36,7 @@ resource "aws_route_table" "rtb-labs" {
   tags = {
     Name = "rtb-labs"
   }
-  depends_on = [ 
+  depends_on = [
     aws_vpc.vpc-labs,
     aws_internet_gateway.igw
   ]
@@ -57,9 +57,9 @@ resource "aws_subnet" "subnet-pub-1" {
   tags = {
     Name = "snet-pub-1"
   }
-  depends_on = [ 
+  depends_on = [
     aws_vpc.vpc-labs
-   ]
+  ]
 }
 
 resource "aws_subnet" "subnet-pub-2" {
@@ -70,9 +70,9 @@ resource "aws_subnet" "subnet-pub-2" {
   tags = {
     Name = "snet-pub-2"
   }
-  depends_on = [ 
+  depends_on = [
     aws_vpc.vpc-labs
-   ]
+  ]
 }
 
 resource "aws_subnet" "subnet-pub-3" {
@@ -83,9 +83,9 @@ resource "aws_subnet" "subnet-pub-3" {
   tags = {
     Name = "snet-pub-1"
   }
-  depends_on = [ 
+  depends_on = [
     aws_vpc.vpc-labs
-   ]
+  ]
 }
 
 resource "aws_security_group" "secg-labs" {
@@ -99,6 +99,13 @@ resource "aws_security_group" "secg-labs" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 3306
     to_port     = 3306
@@ -106,12 +113,19 @@ resource "aws_security_group" "secg-labs" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name = "sg-labs"
   }
-  depends_on = [ 
+  depends_on = [
     aws_vpc.vpc-labs
-   ]
+  ]
 }
 
 # Create DB subnet group
@@ -122,12 +136,12 @@ resource "aws_db_subnet_group" "sng-labs" {
   tags = {
     Name = "sng-labs"
   }
-  depends_on = [ 
+  depends_on = [
     aws_vpc.vpc-labs
-   ]
+  ]
 }
 
-# Create RDS option group
+# Create mysql RDS option group
 resource "aws_db_option_group" "og-mysql-labs" {
   name                     = "og-mysql-labs"
   option_group_description = "Option Group"
@@ -135,34 +149,68 @@ resource "aws_db_option_group" "og-mysql-labs" {
   major_engine_version     = "8.0"
 }
 
-# Create RDS parameter group
+# Create mysql RDS parameter group
 resource "aws_db_parameter_group" "pg-mysql8-labs" {
   name   = "pg-mysql8-labs"
   family = "mysql8.0"
 }
 
 
-# Create RDS instance
+# Create mysql RDS instance
 resource "aws_db_instance" "rds-mysql-labs" {
-  identifier                      = "rds-mysql-labs"
-  instance_class                  = "db.t3.micro"
-  allocated_storage               = 10
-  engine                          = "mysql"
-  engine_version                  = "8.0"
-  username                        = var.db_username
-  password                        = var.db_password
-  db_subnet_group_name            = aws_db_subnet_group.sng-labs.name
-  vpc_security_group_ids          = [aws_security_group.secg-labs.id]
-  parameter_group_name            = aws_db_parameter_group.pg-mysql8-labs.name
-  option_group_name               = aws_db_option_group.og-mysql-labs.name
+  identifier             = "rds-mysql-labs"
+  instance_class         = "db.t4g.micro"
+  allocated_storage      = 20
+  engine                 = "mysql"
+  engine_version         = "8.0.39"
+  storage_type           = "gp3"
+  apply_immediately      = true
+  username               = var.db_username
+  password               = var.db_password
+  db_subnet_group_name   = aws_db_subnet_group.sng-labs.name
+  vpc_security_group_ids = [aws_security_group.secg-labs.id]
+  parameter_group_name   = aws_db_parameter_group.pg-mysql8-labs.name
+  option_group_name      = aws_db_option_group.og-mysql-labs.name
   # performance_insights_enabled    = true
   # performance_insights_kms_key_id = "arn:aws:kms:sa-east-1:323005945174:key/7bc7927b-e6d7-4c8c-b50e-956575886093"
-  publicly_accessible             = true
-  skip_final_snapshot             = true
+  publicly_accessible = true
+  skip_final_snapshot = true
 
-  depends_on = [ 
+  depends_on = [
     aws_db_subnet_group.sng-labs,
     aws_db_option_group.og-mysql-labs,
     aws_db_parameter_group.pg-mysql8-labs
-   ]
+  ]
+}
+
+# Create postgres RDS parameter group
+resource "aws_db_parameter_group" "pg-psql16-labs" {
+  name   = "pg-psql16-labs"
+  family = "postgres16"
+}
+
+
+# Create postgres RDS instance
+resource "aws_db_instance" "rds-psql-labs" {
+  identifier             = "rds-psql-labs"
+  instance_class         = "db.t4g.micro"
+  allocated_storage      = 20
+  engine                 = "postgres"
+  engine_version         = "16.4"
+  apply_immediately      = true
+  storage_type           = "gp3"
+  username               = var.db_username
+  password               = var.db_password
+  db_subnet_group_name   = aws_db_subnet_group.sng-labs.name
+  vpc_security_group_ids = [aws_security_group.secg-labs.id]
+  parameter_group_name   = aws_db_parameter_group.pg-psql16-labs.name
+  # performance_insights_enabled    = true
+  # performance_insights_kms_key_id = "arn:aws:kms:sa-east-1:323005945174:key/7bc7927b-e6d7-4c8c-b50e-956575886093"
+  publicly_accessible = true
+  skip_final_snapshot = true
+
+  depends_on = [
+    aws_db_subnet_group.sng-labs,
+    aws_db_parameter_group.pg-psql16-labs
+  ]
 }
