@@ -183,34 +183,34 @@ resource "aws_db_instance" "rds-mysql-labs" {
   ]
 }
 
-# Create postgres RDS parameter group
-resource "aws_db_parameter_group" "pg-psql16-labs" {
-  name   = "pg-psql16-labs"
-  family = "postgres16"
-}
+# # Create postgres RDS parameter group
+# resource "aws_db_parameter_group" "pg-psql16-labs" {
+#   name   = "pg-psql16-labs"
+#   family = "postgres16"
+# }
 
 
-# Create postgres RDS instance
-resource "aws_db_instance" "rds-psql-labs" {
-  identifier             = "rds-psql-labs"
-  instance_class         = "db.t4g.micro"
-  allocated_storage      = 20
-  engine                 = "postgres"
-  engine_version         = "16.4"
-  apply_immediately      = true
-  storage_type           = "gp3"
-  username               = var.db_username
-  password               = var.db_password
-  db_subnet_group_name   = aws_db_subnet_group.sng-labs.name
-  vpc_security_group_ids = [aws_security_group.secg-labs.id]
-  parameter_group_name   = aws_db_parameter_group.pg-psql16-labs.name
-  # performance_insights_enabled    = true
-  # performance_insights_kms_key_id = "arn:aws:kms:sa-east-1:323005945174:key/7bc7927b-e6d7-4c8c-b50e-956575886093"
-  publicly_accessible = true
-  skip_final_snapshot = true
+# # Create postgres RDS instance
+# resource "aws_db_instance" "rds-psql-labs" {
+#   identifier             = "rds-psql-labs"
+#   instance_class         = "db.t4g.micro"
+#   allocated_storage      = 20
+#   engine                 = "postgres"
+#   engine_version         = "16.4"
+#   apply_immediately      = true
+#   storage_type           = "gp3"
+#   username               = var.db_username
+#   password               = var.db_password
+#   db_subnet_group_name   = aws_db_subnet_group.sng-labs.name
+#   vpc_security_group_ids = [aws_security_group.secg-labs.id]
+#   parameter_group_name   = aws_db_parameter_group.pg-psql16-labs.name
+#   # performance_insights_enabled    = true
+#   # performance_insights_kms_key_id = "arn:aws:kms:sa-east-1:323005945174:key/7bc7927b-e6d7-4c8c-b50e-956575886093"
+#   publicly_accessible = true
+#   skip_final_snapshot = true
 
-  depends_on = [
-    aws_db_subnet_group.sng-labs,
-    aws_db_parameter_group.pg-psql16-labs
-  ]
-}
+#   depends_on = [
+#     aws_db_subnet_group.sng-labs,
+#     aws_db_parameter_group.pg-psql16-labs
+#   ]
+# }
