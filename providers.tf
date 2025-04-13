@@ -1,3 +1,4 @@
+# Terraform provider
 terraform {
   required_providers {
     aws = {
@@ -5,4 +6,9 @@ terraform {
       version = "~> 5.0"
     }
   }
+}
+
+# AWS Provider
+provider "aws" {
+  region = "sa-east-1"
 }
